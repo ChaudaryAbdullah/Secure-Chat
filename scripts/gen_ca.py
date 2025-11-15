@@ -1,8 +1,7 @@
 """Create Root CA (RSA + self-signed X.509) using cryptography.""" 
-#!/usr/bin/env python3
 """
-Root Certificate Authority (CA) Generator
-Generates a self-signed root CA certificate for the secure chat PKI
+Root CA Generation Script
+Creates a self-signed root Certificate Authority for the secure chat system.
 """
 
 from cryptography import x509
@@ -14,41 +13,41 @@ import datetime
 import os
 
 def generate_root_ca():
-    """Generate root CA private key and self-signed certificate"""
-    
-    print("[*] Generating Root CA...")
+    """Generate a self-signed root CA certificate and private key."""
     
     # Create certs directory if it doesn't exist
-    os.makedirs("certs", exist_ok=True)
+    os.makedirs('certs', exist_ok=True)
     
-    # Generate RSA private key for CA (4096 bits for CA security)
-    ca_private_key = rsa.generate_private_key(
+    print("[*] Generating RSA private key for Root CA...")
+    # Generate RSA private key (2048 bits minimum for security)
+    private_key = rsa.generate_private_key(
         public_exponent=65537,
-        key_size=4096,
+        key_size=2048,
         backend=default_backend()
     )
     
-    # Define CA subject and issuer (self-signed, so they're the same)
+    print("[*] Creating self-signed certificate...")
+    # Create certificate subject
     subject = issuer = x509.Name([
         x509.NameAttribute(NameOID.COUNTRY_NAME, u"PK"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Islamabad"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, u"Islamabad"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"FAST-NUCES SecureChat"),
-        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, u"Root CA"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Punjab"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, u"Rawalpindi"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"FAST NUCES SecureChat"),
+        x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, u"Certificate Authority"),
         x509.NameAttribute(NameOID.COMMON_NAME, u"SecureChat Root CA"),
     ])
     
-    # Build certificate
-    cert_builder = (
+    # Build the certificate
+    certificate = (
         x509.CertificateBuilder()
         .subject_name(subject)
         .issuer_name(issuer)
-        .public_key(ca_private_key.public_key())
+        .public_key(private_key.public_key())
         .serial_number(x509.random_serial_number())
         .not_valid_before(datetime.datetime.utcnow())
         .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=3650))  # 10 years
         .add_extension(
-            x509.BasicConstraints(ca=True, path_length=0),
+            x509.BasicConstraints(ca=True, path_length=None),
             critical=True,
         )
         .add_extension(
@@ -66,32 +65,39 @@ def generate_root_ca():
             critical=True,
         )
         .add_extension(
-            x509.SubjectKeyIdentifier.from_public_key(ca_private_key.public_key()),
+            x509.SubjectKeyIdentifier.from_public_key(private_key.public_key()),
             critical=False,
         )
+        .sign(private_key, hashes.SHA256(), default_backend())
     )
     
-    # Self-sign the certificate
-    ca_certificate = cert_builder.sign(ca_private_key, hashes.SHA256(), default_backend())
-    
-    # Save private key (encrypted with password)
-    with open("certs/ca_private_key.pem", "wb") as f:
-        f.write(ca_private_key.private_bytes(
+    print("[*] Saving CA private key to certs/ca_private_key.pem...")
+    # Write private key to file (encrypted with password for security)
+    with open('certs/ca_private_key.pem', 'wb') as f:
+        f.write(private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=serialization.BestAvailableEncryption(b"securechat_ca_password")
+            encryption_algorithm=serialization.NoEncryption()  # For simplicity; use BestAvailableEncryption in production
         ))
     
-    # Save certificate
-    with open("certs/ca_certificate.pem", "wb") as f:
-        f.write(ca_certificate.public_bytes(serialization.Encoding.PEM))
+    print("[*] Saving CA certificate to certs/ca_cert.pem...")
+    # Write certificate to file
+    with open('certs/ca_cert.pem', 'wb') as f:
+        f.write(certificate.public_bytes(serialization.Encoding.PEM))
     
-    print("Root CA generated successfully!")
-    print(f"    Private Key: certs/ca_private_key.pem")
-    print(f"    Certificate: certs/ca_certificate.pem")
-    print(f"    Valid until: {ca_certificate.not_valid_after}")
+    print("\n[✓] Root CA generated successfully!")
+    print("    - Private Key: certs/ca_private_key.pem")
+    print("    - Certificate: certs/ca_cert.pem")
+    print(f"    - Serial Number: {certificate.serial_number}")
+    print(f"    - Valid From: {certificate.not_valid_before}")
+    print(f"    - Valid Until: {certificate.not_valid_after}")
+    print(f"    - Subject: {certificate.subject.rfc4514_string()}")
     
-    return ca_private_key, ca_certificate
+    return private_key, certificate
 
-if __name__ == "__main__":
-    generate_root_ca()
+if __name__ == '__main__':
+    try:
+        generate_root_ca()
+    except Exception as e:
+        print(f"[✗] Error generating Root CA: {e}")
+        raise

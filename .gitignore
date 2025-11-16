@@ -6,5 +6,5 @@ instance/
 venv/
 app/__pycache__/
 app/storage/__pycache__/
-app/models/__pycache__/
+app/common/__pycache__/
 app/crypto/__pycache__/

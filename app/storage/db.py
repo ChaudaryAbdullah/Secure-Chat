@@ -8,13 +8,17 @@ import mysql.connector
 from mysql.connector import Error
 import os
 import secrets
-from app.common.utils import sha256_hex, constant_time_compare
+from dotenv import load_dotenv
+from ..common.utils import sha256_hex, constant_time_compare
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class DatabaseManager:
     """Manages MySQL database operations for user credentials."""
     
-    def __init__(self, host='localhost', database='securechat', user='root', password=''):
+    def __init__(self, host='localhost', database='securechat', user='root', password='', port=3306):
         """
         Initialize database connection.
         
@@ -23,8 +27,10 @@ class DatabaseManager:
             database: Database name
             user: MySQL username
             password: MySQL password
+            port: MySQL port
         """
         self.host = host
+        self.port = port
         self.database = database
         self.user = user
         self.password = password
@@ -35,6 +41,7 @@ class DatabaseManager:
         try:
             self.connection = mysql.connector.connect(
                 host=self.host,
+                port=getattr(self, 'port', 3306),
                 database=self.database,
                 user=self.user,
                 password=self.password
@@ -252,6 +259,7 @@ def initialize_database():
     # Load configuration from environment or use defaults
     db_config = {
         'host': os.getenv('DB_HOST', 'localhost'),
+        'port': int(os.getenv('DB_PORT', 3306)),
         'database': os.getenv('DB_NAME', 'securechat'),
         'user': os.getenv('DB_USER', 'root'),
         'password': os.getenv('DB_PASSWORD', '')

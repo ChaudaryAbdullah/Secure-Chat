@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "seqno": 1,
+    "timestamp": 1763283588410,
+    "ciphertext": "mqEhw9jPeF20dx2+DIwNLBO3slVBziZTu9zF83N29ic=",
+    "signature": "kE/K74pLqCdGHJCQpdGVEps3RP6kHu55qNhSVCK4wFC5Lp/vv5ubpYuzL3KUa7WQM56b6dSeJFXcWlYmb127aX3mmueVJGQeB4hI207s86QOpKE1wW+0DrOjLolZAsj/g7+OhQaN6H6oNIFxzNXHCZoSVn75KFjOJFmuuRq8j5OMI8QkjTPDB6Lk5G1FisINYZrX6mD6GSrEIBcBWKtXyyZrcTjjyPrHoPaEAp3Q1jc6xiCt0+v1N5nE6KIR7RHKNbgiq7oAuCYF1qlzhTvkhv7zBn7pNxQTl4yT4xMCyhBkS3iVCZ/nkjTvdN9PeqePAKoHy3XY7YrNll/sqNSTug==",
+    "peer_fingerprint": "c29779759c7a01313d5b39dc6430dab4f53537fcfc4f94d25a1d5e959fcc776b"
+  }
+]

@@ -210,4 +210,17 @@ class TranscriptLogger:
         """Get SHA256 hash of transcript for integrity verification."""
         transcript_json = json.dumps(self.transcript, sort_keys=True)
         return sha256_hex(transcript_json.encode('utf-8'))
+    
+    def compute_transcript_hash(self):
+        """Compute transcript hash (alias for get_hash)."""
+        return self.get_hash()
+    
+    def get_message_count(self):
+        """Get the number of messages in the transcript."""
+        return len(self.transcript)
+    
+    @property
+    def filepath(self):
+        """Get the transcript file path."""
+        return self.transcript_path
 

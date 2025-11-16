@@ -10,6 +10,7 @@ import base64
 import secrets
 import hashlib
 import re
+import json
 
 def now_ms():
     """Get current Unix timestamp in milliseconds."""
@@ -119,3 +120,107 @@ def constant_time_compare(a, b):
     for x, y in zip(a, b):
         result |= ord(x) ^ ord(y)
     return result == 0
+
+
+def create_transcript_path(session_type, username):
+    """Create a transcript file path for a given session."""
+    transcripts_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'transcripts')
+    os.makedirs(transcripts_dir, exist_ok=True)
+    session_id = f"{session_type}_{username}"
+    return os.path.join(transcripts_dir, f"{session_id}_transcript.json")
+
+
+class TranscriptLogger:
+    """Logs chat messages in append-only transcript format."""
+    
+    def __init__(self, transcript_path, session_type="client"):
+        """Initialize transcript logger.
+        
+        Args:
+            transcript_path: Path to the transcript file
+            session_type: Type of session ("client" or "server")
+        """
+        self.transcript_path = transcript_path
+        self.session_type = session_type
+        self.transcript = []
+        self._load_existing()
+    
+    def _load_existing(self):
+        """Load existing transcript if it exists."""
+        if os.path.exists(self.transcript_path):
+            try:
+                with open(self.transcript_path, 'r') as f:
+                    self.transcript = json.load(f)
+            except Exception as e:
+                print(f"[!] Could not load existing transcript: {e}")
+                self.transcript = []
+    
+    def add_message(self, sender, receiver, message, timestamp=None):
+        """Add a message to the transcript."""
+        if timestamp is None:
+            timestamp = now_ms()
+        
+        entry = {
+            'timestamp': timestamp,
+            'sender': sender,
+            'receiver': receiver,
+            'message': message
+        }
+        self.transcript.append(entry)
+        self._save()
+    
+    def log_message(self, seqno, timestamp, ciphertext_b64, signature_b64, peer_fingerprint):
+        """Log an encrypted message to the transcript with all metadata.
+        
+        Args:
+            seqno: Sequence number
+            timestamp: Message timestamp
+            ciphertext_b64: Base64-encoded ciphertext
+            signature_b64: Base64-encoded signature
+            peer_fingerprint: Peer's certificate fingerprint
+        """
+        entry = {
+            'seqno': seqno,
+            'timestamp': timestamp,
+            'ciphertext': ciphertext_b64,
+            'signature': signature_b64,
+            'peer_fingerprint': peer_fingerprint
+        }
+        self.transcript.append(entry)
+        self._save()
+    
+    def close(self):
+        """Close the transcript (ensure final save)."""
+        self._save()
+    
+    def _save(self):
+        """Save transcript to file."""
+        try:
+            os.makedirs(os.path.dirname(self.transcript_path), exist_ok=True)
+            with open(self.transcript_path, 'w') as f:
+                json.dump(self.transcript, f, indent=2)
+        except Exception as e:
+            print(f"[!] Could not save transcript: {e}")
+    
+    def get_transcript(self):
+        """Get the complete transcript."""
+        return self.transcript
+    
+    def get_hash(self):
+        """Get SHA256 hash of transcript for integrity verification."""
+        transcript_json = json.dumps(self.transcript, sort_keys=True)
+        return sha256_hex(transcript_json.encode('utf-8'))
+    
+    def compute_transcript_hash(self):
+        """Compute transcript hash (alias for get_hash)."""
+        return self.get_hash()
+    
+    def get_message_count(self):
+        """Get the number of messages in the transcript."""
+        return len(self.transcript)
+    
+    @property
+    def filepath(self):
+        """Get the transcript file path."""
+        return self.transcript_path
+

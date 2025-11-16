@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+instance/
+.env
+.vscode/
+venv/
+app/__pycache__/
+app/storage/__pycache__/
+app/models/__pycache__/
+app/crypto/__pycache__/

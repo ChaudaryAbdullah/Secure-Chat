@@ -4,9 +4,9 @@ Digital Signature Module
 Handles RSA signing and verification with SHA-256.
 """
 
-import base64
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
+from app.common.utils import b64e, b64d, sha256_hex
 
 
 class SignatureManager:
@@ -72,10 +72,8 @@ class SignatureManager:
         # Concatenate all transcript lines
         transcript_data = ''.join(transcript_lines).encode('utf-8')
         
-        # Compute SHA-256
-        digest = SignatureManager.compute_sha256(transcript_data)
-        
-        return digest.hex()
+        # Compute SHA-256 using helper function
+        return sha256_hex(transcript_data)
     
     @staticmethod
     def sign_digest(digest, private_key):
@@ -143,7 +141,7 @@ class SignatureManager:
         Returns:
             str: Base64-encoded signature
         """
-        return base64.b64encode(signature).decode('utf-8')
+        return b64e(signature)
     
     @staticmethod
     def decode_signature(b64_signature):
@@ -156,7 +154,7 @@ class SignatureManager:
         Returns:
             bytes: Signature
         """
-        return base64.b64decode(b64_signature)
+        return b64d(b64_signature)
     
     @staticmethod
     def create_message_signature(seqno, timestamp, ciphertext, private_key):

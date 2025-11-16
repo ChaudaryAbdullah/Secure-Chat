@@ -9,3 +9,4 @@ app/storage/__pycache__/
 app/common/__pycache__/
 app/crypto/__pycache__/
 transcripts/
+certs

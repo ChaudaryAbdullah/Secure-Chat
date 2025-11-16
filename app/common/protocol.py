@@ -161,7 +161,7 @@ class ProtocolMessage:
         })
     
     @staticmethod
-    def create_chat_message(seqno, ciphertext_b64, signature_b64):
+    def create_chat_message(seqno, ciphertext_b64, signature_b64, timestamp=None):
         """
         Create MSG (chat message).
         
@@ -169,11 +169,13 @@ class ProtocolMessage:
             seqno: Sequence number
             ciphertext_b64: Base64-encoded ciphertext
             signature_b64: Base64-encoded signature
+            timestamp: Unix timestamp in ms (if None, generates new one)
         
         Returns:
             str: JSON message
         """
-        timestamp = now_ms()  # Use the helper function
+        if timestamp is None:
+            timestamp = now_ms()  # Use the helper function
         
         return json.dumps({
             "type": ProtocolMessage.TYPE_MSG,

@@ -416,7 +416,7 @@ class SecureChatClient:
         )
         
         # Create message
-        msg = ProtocolMessage.create_chat_message(self.seqno_sent, ct_b64, sig_b64)
+        msg = ProtocolMessage.create_chat_message(self.seqno_sent, ct_b64, sig_b64, timestamp)
         send_message(self.socket, msg)
         
         # Log to transcript

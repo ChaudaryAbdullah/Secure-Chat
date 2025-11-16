@@ -109,7 +109,7 @@ pip install cryptography mysql-connector-python python-dotenv
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/[your-username]/securechat-skeleton.git
+git clone https://github.com/ChaudaryAbdullah/Secure-Chat.git
 cd securechat-skeleton
 ```
 
@@ -478,7 +478,7 @@ Receipt: ✗ INVALID    # Hash mismatch
 
 ## 📂 GitHub Repository
 
-**Repository:** https://github.com/chaudaryAbdullah/securechat-skeleton
+**Repository:** https://github.com/chaudaryAbdullah/Secure-Chat
 
 ### Commit Guidelines
 
@@ -651,7 +651,7 @@ INSERT INTO users (email, username, salt, pwd_hash) VALUES
 
 **Abdullah Shakir**  
 **Roll Number:** 22i-1138  
-**GitHub:** https://github.com/chaudaryAbdullah/securechat-skeleton
+**GitHub:** https://github.com/chaudaryAbdullah/Secure-Chat
 
 ---
 
@@ -660,3 +660,4 @@ INSERT INTO users (email, username, salt, pwd_hash) VALUES
 This project is submitted as part of academic coursework for Information Security (Fall 2025) at FAST-NUCES. All rights reserved.
 
 ---
+
